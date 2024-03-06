@@ -1,0 +1,28 @@
+Deploying the application in a containerized environment. we will be serving the static file using the golang based server and build an Image out of it.
+
+1. Authenticate with ECR : aws ecr get-login-password --region <region> | docker login --username AWS --password-stdin <account-id>.dkr.ecr.<region>.amazonaws.com
+2. Build Image : docker build -t static-website .
+3. Tag Docker image: docker tag static-website:latest <account-id>.dkr.ecr.<region>.amazonaws.com/static-website:latest
+4. Push Image: docker push <account-id>.dkr.ecr.<region>.amazonaws.com/static-website:latest
+
+Under the terraform-files, it has terraform manifest to launch the Infrastructure, load balancer controller, application deployments.
+
+Deploy this image in AWS EKS using Terraform. While using EKS we can use the Loadbalancer Controller and Ingress Resource expose the enpoint of the Golang server hosting static page
+
+Use Certificate manager to create certificate and use annotations in Ingress resource for SSL Offloading with an Application Load Balancer and use "alb.ingress.kubernetes.io/ssl-redirect: '443'" for redirecting http to https
+
+
+
+Test:
+1. Basic Functionality Check:
+
+    Access the application URL: Once the deployment is complete, access the application URL constructed from your Ingress resource and the Application Load Balancer (ALB) DNS name.
+2. Use kubectl get
+
+ commands:
+
+    kubectl get ingresses: Verify if the static-website Ingress resource is created successfully.
+
+    kubectl get deployments: Check if the static-website deployment is running with pods in a ready state.
+
+    kubectl get services: Ensure the static-website service is running 
